@@ -1,58 +1,53 @@
 #include "json_small.hpp"
 
-// parse JSON from a source, ignoring comments
-template <typename T>
-nlohmann::json parse_json(T&& input)
-{
-    return nlohmann::json::parse(input,nullptr,true,true);
-}
-
-Json::Json(std::istream& input): json(parse_json(input))
+Json::Json(std::istream& input):
+        nlohmann::json(nlohmann::json::parse(input,nullptr,true,true))
 {
 }
 
-Json::Json(const std::string& input): json(parse_json(input))
+Json::Json(const std::string& input):
+        nlohmann::json(nlohmann::json::parse(input,nullptr,true,true))
 {
 }
 
-Json::Json(const nlohmann::json& input): json(input)
+Json::Json(const nlohmann::json& input): nlohmann::json(input)
 {
 }
 
 bool Json::isNull() const
 {
-    return json.is_null();
+    return this->is_null();
 }
 
 bool Json::boolValue(bool& value) const
 {
-    if (!json.is_boolean())
+    if (!this->is_boolean())
         return false;
-    value = json.get<bool>();
+    value = this->get<bool>();
     return true;
 }
 
 bool Json::intValue(int64_t& value) const
 {
-    if (!json.is_number_integer())
+    if (!this->is_number_integer())
         return false;
-    value = json.get<int64_t>();
+    value = this->get<int64_t>();
     return true;
 }
 
 bool Json::floatValue(double& value) const
 {
-    if (!json.is_number_float())
+    if (!this->is_number_float())
         return false;
-    value = json.get<double>();
+    value = this->get<double>();
     return true;
 }
 
 bool Json::arrayValue(JsonArray& value) const
 {
-    if (!json.is_array())
+    if (!this->is_array())
         return false;
-    auto tmp = json.get<std::vector<nlohmann::json>>();
+    auto tmp = this->get<std::vector<nlohmann::json>>();
     value.clear();
     value.reserve(tmp.size());
     for (size_t i = 0; i < tmp.size(); ++i)
@@ -62,22 +57,22 @@ bool Json::arrayValue(JsonArray& value) const
 
 bool Json::objectValue(JsonObject& value) const
 {
-    if (!json.is_object())
+    if (!this->is_object())
         return false;
-    auto tmp = json.get<std::unordered_map<std::string,nlohmann::json>>();
+    auto tmp = this->get<std::unordered_map<std::string,nlohmann::json>>();
     value.clear();
     value.reserve(tmp.size());
     for (auto iter = tmp.begin(); iter != tmp.end(); ++iter)
-        value.insert(*iter);
+        value.insert(std::make_pair(iter->first,Json(iter->second)));
     return true;
 }
 
 Json Json::operator[](size_t index) const
 {
-    return Json(json.at(index));
+    return Json(this->at(index));
 }
 
 Json Json::operator[](const std::string& key) const
 {
-    return Json(json.at(key));
+    return Json(this->at(key));
 }

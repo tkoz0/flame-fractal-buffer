@@ -10,10 +10,8 @@ typedef std::vector<Json> JsonArray;
 typedef std::unordered_map<std::string,Json> JsonObject;
 
 // interface for reading data from nlohmann json
-class Json
+class Json: private nlohmann::json
 {
-private:
-    const nlohmann::json& json;
 public:
     // create json object from input stream or string
     Json(std::istream& input);
