@@ -8,11 +8,17 @@ Types
 
 #include "../utils/jrand.h"
 
-typedef float num_t;
-
 // machine epsilon
 #define _EMACH32 (1.0F / (float)(1  << 23)) // 1.1920928955078125e-07
 #define _EMACH64 (1.0 / (double)(1L << 52)) // 2.220446049250313e-16
+
+// floating point type for calculations
+typedef float num_t;
+//typedef double num_t;
+
+// multiplier for scaling to 8 bit pixel values
+#define _IMG256_MULT (256.0 * (1.0F - 8.0*_EMACH32))
+//#define _IMG256_MULT (256.0 * (1.0  - 8.0*_EMACH64))
 
 // pi based constants
 #define _PI    ((num_t) 3.141592653589793)

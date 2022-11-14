@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -67,7 +66,14 @@ uint32_t *render_flame(flame_t *f)
 
 int main(int argc, char **argv)
 {
-    assert(argc > 2);
+    if (argc <= 2)
+    {
+        fprintf(stderr,"render flame fractal frequency buffer\n");
+        fprintf(stderr,"usage: ffbuf <input> <output>\n");
+        fprintf(stderr,"input: json data from file or stdin (-)\n");
+        fprintf(stderr,"output: binary data to file or stdout (-)\n");
+        exit(1);
+    }
     std::string input_file(argv[1]);
     std::string output_file(argv[2]);
     Json input_data;
