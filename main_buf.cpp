@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     else // input from file
         input_data = Json(read_text_file(input_file));
     // test
-    std::cerr << "input data: " << input_data << std::endl;
+    std::cerr << "input flame: " << input_data << std::endl;
     flame_t flame;
     flame.name = nullptr;
     flame.xforms = nullptr;

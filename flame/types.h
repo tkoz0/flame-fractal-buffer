@@ -20,6 +20,9 @@ typedef float num_t;
 #define _IMG256_MULT (256.0 * (1.0F - 8.0*_EMACH32))
 //#define _IMG256_MULT (256.0 * (1.0  - 8.0*_EMACH64))
 
+#define _EMACH _EMACH32
+//#define _EMACH _EMACH64
+
 // pi based constants
 #define _PI    ((num_t) 3.141592653589793)
 #define _2PI   ((num_t) 6.283185307179586)

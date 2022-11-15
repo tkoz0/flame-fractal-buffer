@@ -43,6 +43,9 @@ uint8_t *render_gray(const uint32_t *buf, size_t X, size_t Y, bool scale_zero,
         sample_min = std::min(sample_min,buf[i]);
         sample_max = std::max(sample_max,buf[i]);
     }
+    fprintf(stderr,"samples in rectangle: %lu\n",sample_count);
+    fprintf(stderr,"min sample = %u\n",sample_min);
+    fprintf(stderr,"max sample = %u\n",sample_max);
     uint8_t *img = (uint8_t*) malloc(X*Y*sizeof(uint8_t));
     num_t scale_min = INFINITY;
     num_t scale_max = -INFINITY;
@@ -56,6 +59,8 @@ uint8_t *render_gray(const uint32_t *buf, size_t X, size_t Y, bool scale_zero,
             scale_min = std::min(scale_min,scale_val);
             scale_max = std::max(scale_max,scale_val);
         }
+    fprintf(stderr,"scaled min = %f\n",scale_min);
+    fprintf(stderr,"scaled max = %f\n",scale_max);
     uint8_t *img_ptr = img;
     num_t mult = _IMG256_MULT / scale_max;
     for (size_t r = Y; r--;) // compute scaled pixel values
@@ -85,7 +90,8 @@ int main(int argc, char **argv)
     {
         fprintf(stderr,"render grayscale image (pgm) from frequency buffer\n");
         fprintf(stderr,"usage: ffgray <json input> <buffer input> <pgm output>\n");
-        fprintf(stderr,"input: TODO\n");
+        fprintf(stderr,"json input: flame fractal parameters\n");
+        fprintf(stderr,"buffer input: the rendered buffer from ffbuf\n");
         fprintf(stderr,"output: pgm image to file or stdout (-)\n");
         exit(1);
     }
@@ -98,6 +104,7 @@ int main(int argc, char **argv)
         json_input_data = Json(std::cin);
     else
         json_input_data = Json(read_text_file(json_input));
+    std::cerr << "input flame: " << json_input_data << std::endl;
     // parse needed parts
     union
     {
@@ -140,10 +147,38 @@ int main(int argc, char **argv)
         _err_exit("error: \"size_x\" should be between 0 and %lu\n",MAX_DIM);
     if (size_y <= 0 || size_y >= MAX_DIM)
         _err_exit("error: \"size_y\" should be between 0 and %lu\n",MAX_DIM);
-    // select scaling function
+    // select scaling function: [0,inf) -> [0,inf) (monotone increasing)
     num_t (*scale_func)(uint32_t);
-    if (scale_func_name == "log")
-        scale_func = [](uint32_t x){ return (num_t)log(1.0+(num_t)x); };
+    if (scale_func_name == "binary") // TODO binary with threshold
+        scale_func = [](uint32_t x)
+            { return (num_t)(x != 0); };
+    else if (scale_func_name == "linear")
+        scale_func = [](uint32_t x)
+            { return (num_t)x; };
+    else if (scale_func_name == "log")
+        scale_func = [](uint32_t x)
+            { return (num_t)log(1.0+(num_t)x); };
+    else if (scale_func_name == "loglog")
+        scale_func = [](uint32_t x)
+            { return (num_t)log(1.0+log(1.0+(num_t)x)); };
+    else if (scale_func_name == "log^2")
+        scale_func = [](uint32_t x)
+            { num_t t = log(1.0+(num_t)x); return t*t; };
+    else if (scale_func_name == "log^3") // TODO power as arg
+        scale_func = [](uint32_t x)
+            { num_t t = log(1.0+(num_t)x); return t*t*t; };
+    else if (scale_func_name == "sqrt")
+        scale_func = [](uint32_t x)
+            { return (num_t)sqrt(1.0+(num_t)x)-(num_t)1.0; };
+    else if (scale_func_name == "cbrt") // TODO nth root
+        scale_func = [](uint32_t x)
+            { return (num_t)cbrt(1.0+(num_t)x)-(num_t)1.0; };
+    else if (scale_func_name == "arctan")
+        scale_func = [](uint32_t x)
+            { return (num_t)atan(1.0+(num_t)x)-_PI_4; };
+    else if (scale_func_name == "recip")
+        scale_func = [](uint32_t x)
+            { return (num_t)x/((num_t)x+(num_t)1.0); };
     else
         _err_exit("error: invalid scaling function\n");
     // read input buffer

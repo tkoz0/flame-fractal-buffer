@@ -155,8 +155,11 @@ static inline uint32_t _pick_xform(num_t *cw, jrand_t *jrand, uint32_t xflen)
 void render_basic(flame_t *flame, uint32_t *histogram, jrand_t *jrand)
 {
     uint64_t bad_value_count = 0;
-    num_t xmul = (float) flame->size_x / (flame->xmax - flame->xmin);
-    num_t ymul = (float) flame->size_y / (flame->ymax - flame->ymin);
+    num_t xmul = (num_t) flame->size_x / (flame->xmax - flame->xmin);
+    num_t ymul = (num_t) flame->size_y / (flame->ymax - flame->ymin);
+    // small correction factor to ensure indexing in bounds
+    xmul *= (1.0 - 8.0*_EMACH);
+    ymul *= (1.0 - 8.0*_EMACH);
     num_t *cw = NULL;
 #ifndef FORCE_EQUAL_XFORM_SELECTION
     _normalize_xform_weights(flame->xforms,flame->xforms_len);
@@ -195,13 +198,14 @@ void render_basic(flame_t *flame, uint32_t *histogram, jrand_t *jrand)
             ++bad_value_count;
             if (bad_value_count <= BAD_VALUE_LIMIT)
             {
-                fprintf(stderr,"renderer_basic(): bad_value (x,y) = (%f,%f)\n",
-                    state.x,state.y);
+                fprintf(stderr,"renderer_basic(): bad_value (x,y) = (%f,%f)"
+                    " (sample number = %lu)\n",
+                    state.x,state.y,flame->samples-1-samples);
                 if (bad_value_count == BAD_VALUE_LIMIT)
                 {
                     fprintf(stderr,"renderer_basic(): not showing more "
-                        "bad value errors\n");
-                    fprintf(stderr,"IFS may not be contractive on average\n");
+                        "bad value errors\nrender_basic(): "
+                        "IFS probably not contractive on average\n");
                 }
             }
             _biunit_rand(1.0,jrand,&(state.x),&(state.y));
