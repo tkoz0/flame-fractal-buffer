@@ -191,9 +191,9 @@ int main(int argc, char **argv)
         ("bits,b",bpo::value<size_t>()->default_value(8),"bit depth")
         ("format,f",bpo::value<std::string>()->default_value("png"),
             "image format")
-        ("input_json",bpo::value<std::string>())
-        ("input_buf",bpo::value<std::string>())
-        ("output_file",bpo::value<std::string>());
+        ("input_json",bpo::value<std::string>(),"(specify as positional arg)")
+        ("input_buf",bpo::value<std::string>(),"(specify as positional arg)")
+        ("output_file",bpo::value<std::string>(),"(specify as positional arg)");
     op_pos.add("input_json",1);
     op_pos.add("input_buf",1);
     op_pos.add("output_file",1);
@@ -209,7 +209,12 @@ int main(int argc, char **argv)
     }
     if (!op_varmap.count("input_json") || !op_varmap.count("input_buf")
         || !op_varmap.count("output_file"))
+    {
+        std::cerr << "usage: ffgray [options] <flame json> <flame buffer>"
+            " <output image>" << std::endl;
+        std::cerr << op_opt;
         _err_exit("error: missing positional argument\n");
+    }
     std::string json_input = op_varmap["input_json"].as<std::string>();
     std::string buf_input = op_varmap["input_buf"].as<std::string>();
     std::string output_file = op_varmap["output_file"].as<std::string>();

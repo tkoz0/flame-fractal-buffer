@@ -1,13 +1,25 @@
+#include <cstdarg>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <boost/program_options.hpp>
 
 #include "parser.hpp"
 #include "flame/renderer.h"
 #include "flame/types.h"
 #include "utils/json_small.hpp"
+
+// print to stderr and exit
+static void _err_exit(const char *f, ...)
+{
+    va_list args;
+    va_start(args,f);
+    vfprintf(stderr,f,args);
+    va_end(args);
+    exit(1);
+}
 
 // read entire contents of file into a string
 std::string read_text_file(const std::string name)
@@ -64,18 +76,35 @@ uint32_t *render_flame(flame_t *f)
     return buf;
 }
 
+namespace bpo = boost::program_options;
+
 int main(int argc, char **argv)
 {
-    if (argc <= 2)
+    bpo::options_description op_opt("options");
+    bpo::positional_options_description op_pos;
+    op_opt.add_options()
+        ("help,h","help information")
+        ("input","(specify as positional arg)")
+        ("output","(specify as positional arg)");
+    op_pos.add("input",1);
+    op_pos.add("output",1);
+    bpo::variables_map op_varmap;
+    bpo::store(bpo::command_line_parser(argc,argv)
+        .options(op_opt).positional(op_pos).run(),op_varmap);
+    if (op_varmap.count("help") || op_varmap.empty())
     {
-        fprintf(stderr,"render flame fractal frequency buffer\n");
-        fprintf(stderr,"usage: ffbuf <input> <output>\n");
-        fprintf(stderr,"input: json data from file or stdin (-)\n");
-        fprintf(stderr,"output: binary data to file or stdout (-)\n");
+        std::cerr << "usage: ffbuf <input json> <output buffer>" << std::endl;
+        std::cerr << op_opt;
         exit(1);
     }
-    std::string input_file(argv[1]);
-    std::string output_file(argv[2]);
+    if (!op_varmap.count("input") || !op_varmap.count("output"))
+    {
+        std::cerr << "usage: ffbuf <input json> <output buffer>" << std::endl;
+        std::cerr << op_opt;
+        _err_exit("error: missing positional argument\n");
+    }
+    std::string input_file = op_varmap["input"].as<std::string>();
+    std::string output_file = op_varmap["output"].as<std::string>();
     Json input_data;
     if (input_file == "-") // input from stdin
         input_data = Json(std::cin);
