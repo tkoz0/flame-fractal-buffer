@@ -2,7 +2,7 @@ CC=gcc
 CPPC=g++
 IDIR=.
 CFLAGS=-I$(IDIR)
-LIBS=-lm -lpng
+LIBS=-lm -lpng -lboost_program_options
 
 FLAME_HEADERS = flame/renderer.h flame/types.h flame/variations.h
 UTILS_HEADERS = utils/jrand.h utils/json_small.hpp
@@ -46,4 +46,4 @@ nlohmann/json.hpp:
 .PHONY: clean
 
 clean:
-	rm jrand.o variations.o renderer.o json_small.o parser.o main_buf.o ffbuf.out ffgray.out
+	rm jrand.o variations.o renderer.o json_small.o parser.o main_buf.o main_gray.o ffbuf.out ffgray.out

@@ -17,8 +17,12 @@ typedef float num_t;
 //typedef double num_t;
 
 // multiplier for scaling to 8 bit pixel values
-#define _IMG256_MULT (256.0 * (1.0F - 8.0*_EMACH32))
-//#define _IMG256_MULT (256.0 * (1.0  - 8.0*_EMACH64))
+#define _IMG8_MULT (256.0 * (1.0F - 8.0*_EMACH32))
+//#define _IMG8_MULT (256.0 * (1.0  - 8.0*_EMACH64))
+
+// multiplier for scaling to 16 bit pixel values
+#define _IMG16_MULT (65536.0 * (1.0F - 8.0*_EMACH32))
+//#define _IMG16_MULT (65536.0 * (1.0  - 8.0*_EMACH64))
 
 #define _EMACH _EMACH32
 //#define _EMACH _EMACH64

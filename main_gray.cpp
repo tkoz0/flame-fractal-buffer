@@ -4,6 +4,7 @@
 #include <sstream>
 #include <boost/gil.hpp>
 #include <boost/gil/extension/io/png.hpp>
+#include <boost/program_options.hpp>
 
 #include "flame/types.h"
 #include "utils/json_small.hpp"
@@ -33,8 +34,8 @@ std::string read_text_file(const std::string name)
 #define INDEX(x,y) (X*(y)+(x))
 
 // render image into a newly allocated buffer
-uint8_t *render_gray(const uint32_t *buf, size_t X, size_t Y, bool scale_zero,
-        num_t (*scale_func)(uint32_t))
+uint8_t *render_gray8(const uint32_t *buf, size_t X, size_t Y,
+        bool scale_zero, num_t (*scale_func)(uint32_t))
 {
     size_t sample_count = 0;
     uint32_t sample_min = -1;
@@ -64,7 +65,7 @@ uint8_t *render_gray(const uint32_t *buf, size_t X, size_t Y, bool scale_zero,
     fprintf(stderr,"scaled min = %f\n",scale_min);
     fprintf(stderr,"scaled max = %f\n",scale_max);
     uint8_t *img_ptr = img;
-    num_t mult = _IMG256_MULT / scale_max;
+    num_t mult = _IMG8_MULT / scale_max;
     for (size_t r = Y; r--;) // compute scaled pixel values
         for (size_t c = 0; c < X; ++c)
         {
@@ -77,7 +78,56 @@ uint8_t *render_gray(const uint32_t *buf, size_t X, size_t Y, bool scale_zero,
     return img;
 }
 
-bool write_pgm(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
+// render image into a newly allocated buffer
+uint16_t *render_gray16(const uint32_t *buf, size_t X, size_t Y,
+        bool scale_zero, num_t (*scale_func)(uint32_t))
+{
+    size_t sample_count = 0;
+    uint32_t sample_min = -1;
+    uint32_t sample_max = 0;
+    for (size_t i = 0; i < X*Y; ++i) // find range of buffer values
+    {
+        sample_count += buf[i];
+        sample_min = std::min(sample_min,buf[i]);
+        sample_max = std::max(sample_max,buf[i]);
+    }
+    fprintf(stderr,"samples in rectangle: %lu\n",sample_count);
+    fprintf(stderr,"min sample = %u\n",sample_min);
+    fprintf(stderr,"max sample = %u\n",sample_max);
+    uint16_t *img = (uint16_t*) malloc(X*Y*sizeof(uint16_t));
+    num_t scale_min = INFINITY;
+    num_t scale_max = -INFINITY;
+    for (size_t r = Y; r--;) // calculate scale range
+        for (size_t c = 0; c < X; ++c)
+        {
+            uint32_t buf_val = buf[INDEX(r,c)];
+            if (!scale_zero)
+                buf_val -= sample_min;
+            num_t scale_val = scale_func(buf_val);
+            scale_min = std::min(scale_min,scale_val);
+            scale_max = std::max(scale_max,scale_val);
+        }
+    fprintf(stderr,"scaled min = %f\n",scale_min);
+    fprintf(stderr,"scaled max = %f\n",scale_max);
+    uint16_t *img_ptr = img;
+    num_t mult = _IMG16_MULT / scale_max;
+    for (size_t r = Y; r--;) // compute scaled pixel values
+        for (size_t c = 0; c < X; ++c)
+        {
+            uint32_t buf_val = buf[INDEX(r,c)];
+            if (!scale_zero)
+                buf_val -= sample_min;
+            num_t scale_val = scale_func(buf_val);
+            // byte order must be big endian for output images
+            //*(img_ptr++) = (uint16_t)(scale_val*mult);
+            *img_ptr = (uint16_t)(scale_val*mult);
+            *img_ptr = (*img_ptr >> 8) | (*img_ptr << 8);
+            ++img_ptr;
+        }
+    return img;
+}
+
+bool write_pgm8(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
 {
     os << "P5" << std::endl;
     os << size_x << " " << size_y << std::endl;
@@ -86,9 +136,32 @@ bool write_pgm(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
     return os.good();
 }
 
-bool write_png(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
+bool write_pgm16(std::ostream& os, size_t size_x, size_t size_y, uint16_t *img)
+{
+    os << "P5" << std::endl;
+    os << size_x << " " << size_y << std::endl;
+    os << "65535" << std::endl;
+    os.write((char*)img,size_x*size_y*sizeof(uint16_t));
+    return os.good();
+}
+
+bool write_png8(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
 {
     boost::gil::gray8_image_t image(size_x,size_y);
+    auto image_view = boost::gil::view(image);
+    for (size_t y = 0; y < size_y; ++y)
+    {
+        auto ptr = image_view.row_begin(y);
+        for (size_t x = 0; x < size_x; ++x)
+            ptr[x] = *(img++);
+    }
+    boost::gil::write_view(os,image_view,boost::gil::png_tag());
+    return os.good();
+}
+
+bool write_png16(std::ostream& os, size_t size_x, size_t size_y, uint16_t *img)
+{
+    boost::gil::gray16_image_t image(size_x,size_y);
     auto image_view = boost::gil::view(image);
     for (size_t y = 0; y < size_y; ++y)
     {
@@ -107,21 +180,45 @@ bool string_ends_with(const std::string& string, const std::string& suffix)
     return l1 >= l2 && string.substr(l1-l2) == suffix;
 }
 
+namespace bpo = boost::program_options;
+
 int main(int argc, char **argv)
 {
-    if (argc <= 3)
+    bpo::options_description op_opt("options");
+    bpo::positional_options_description op_pos;
+    op_opt.add_options()
+        ("help,h","help information")
+        ("bits,b",bpo::value<size_t>()->default_value(8),"bit depth")
+        ("format,f",bpo::value<std::string>()->default_value("png"),
+            "image format")
+        ("input_json",bpo::value<std::string>())
+        ("input_buf",bpo::value<std::string>())
+        ("output_file",bpo::value<std::string>());
+    op_pos.add("input_json",1);
+    op_pos.add("input_buf",1);
+    op_pos.add("output_file",1);
+    bpo::variables_map op_varmap;
+    bpo::store(bpo::command_line_parser(argc,argv)
+        .options(op_opt).positional(op_pos).run(),op_varmap);
+    if (op_varmap.count("help") || op_varmap.empty())
     {
-        fprintf(stderr,"render grayscale image (pgm) from frequency buffer\n");
-        fprintf(stderr,"usage: ffgray <json input> <buffer input> <image output>\n");
-        fprintf(stderr,"json input: flame fractal parameters\n");
-        fprintf(stderr,"buffer input: the rendered buffer from ffbuf\n");
-        fprintf(stderr,"output: file or stdout (-)\n");
-        // TODO specify output format pgm/png and 8/16 bit
+        std::cerr << "usage: ffgray [options] <flame json> <flame buffer>"
+            " <output image>" << std::endl;
+        std::cerr << op_opt;
         exit(1);
     }
-    std::string json_input(argv[1]);
-    std::string buf_input(argv[2]);
-    std::string output_file(argv[3]);
+    if (!op_varmap.count("input_json") || !op_varmap.count("input_buf")
+        || !op_varmap.count("output_file"))
+        _err_exit("error: missing positional argument\n");
+    std::string json_input = op_varmap["input_json"].as<std::string>();
+    std::string buf_input = op_varmap["input_buf"].as<std::string>();
+    std::string output_file = op_varmap["output_file"].as<std::string>();
+    size_t bits = op_varmap["bits"].as<size_t>();
+    std::string format = op_varmap["format"].as<std::string>();
+    if (bits != 8 && bits != 16)
+        _err_exit("error: bit depth must be 8 or 16\n");
+    if (format != "pgm" && format != "png")
+        _err_exit("error: format must be pgm or png\n");
     // read input json
     Json json_input_data;
     if (json_input == "-")
@@ -219,32 +316,62 @@ int main(int argc, char **argv)
             _err_exit("error: cannot read file or not enough data\n");
     }
     // render
-    uint8_t *img = render_gray(buf,size_x,size_y,scale_zero,scale_func);
+    uint8_t *img8 = nullptr;
+    uint16_t *img16 = nullptr;
+    if (bits == 8)
+        img8 = render_gray8(buf,size_x,size_y,scale_zero,scale_func);
+    if (bits == 16)
+        img16 = render_gray16(buf,size_x,size_y,scale_zero,scale_func);
     // write output
     if (output_file == "-")
     {
-        if (!write_pgm(std::cout,size_x,size_y,img))
-            _err_exit("error: failure writing to stdout\n");
+        if (bits == 8)
+        {
+            if (!write_pgm8(std::cout,size_x,size_y,img8))
+                _err_exit("error: failure writing to stdout\n");
+        }
+        if (bits == 16)
+        {
+            if (!write_pgm16(std::cout,size_x,size_y,img16))
+                _err_exit("error: failure writing to stdout\n");
+        }
     }
-    else if (string_ends_with(output_file,".png"))
+    else if (format == "png")
     {
         std::ofstream os(output_file);
         if (!os.good())
             _err_exit("error: failure opening output file\n");
-        if (!write_png(os,size_x,size_y,img))
-            _err_exit("error: failure writing to file\n");
+        if (bits == 8)
+        {
+            if (!write_png8(os,size_x,size_y,img8))
+                _err_exit("error: failure writing to file\n");
+        }
+        if (bits == 16)
+        {
+            if (!write_png16(os,size_x,size_y,img16))
+                _err_exit("error: failure writing to file\n");
+        }
         os.close();
     }
-    else
+    else // pgm
     {
         std::ofstream os(output_file);
         if (!os.good())
             _err_exit("error: failure opening output file\n");
-        if (!write_pgm(os,size_x,size_y,img))
-            _err_exit("error: failure writing to file\n");
+        if (bits == 8)
+        {
+            if (!write_pgm8(os,size_x,size_y,img8))
+                _err_exit("error: failure writing to file\n");
+        }
+        if (bits == 16)
+        {
+            if (!write_pgm16(os,size_x,size_y,img16))
+                _err_exit("error: failure writing to file\n");
+        }
         os.close();
     }
     free(buf);
-    free(img);
+    if (img8) free(img8);
+    if (img16) free(img16);
     return 0;
 }
