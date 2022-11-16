@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <boost/gil.hpp>
+#include <boost/gil/extension/io/png.hpp>
 
 #include "flame/types.h"
 #include "utils/json_small.hpp"
@@ -84,15 +86,37 @@ bool write_pgm(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
     return os.good();
 }
 
+bool write_png(std::ostream& os, size_t size_x, size_t size_y, uint8_t *img)
+{
+    boost::gil::gray8_image_t image(size_x,size_y);
+    auto image_view = boost::gil::view(image);
+    for (size_t y = 0; y < size_y; ++y)
+    {
+        auto ptr = image_view.row_begin(y);
+        for (size_t x = 0; x < size_x; ++x)
+            ptr[x] = *(img++);
+    }
+    boost::gil::write_view(os,image_view,boost::gil::png_tag());
+    return os.good();
+}
+
+bool string_ends_with(const std::string& string, const std::string& suffix)
+{
+    size_t l1 = string.length();
+    size_t l2 = suffix.length();
+    return l1 >= l2 && string.substr(l1-l2) == suffix;
+}
+
 int main(int argc, char **argv)
 {
     if (argc <= 3)
     {
         fprintf(stderr,"render grayscale image (pgm) from frequency buffer\n");
-        fprintf(stderr,"usage: ffgray <json input> <buffer input> <pgm output>\n");
+        fprintf(stderr,"usage: ffgray <json input> <buffer input> <image output>\n");
         fprintf(stderr,"json input: flame fractal parameters\n");
         fprintf(stderr,"buffer input: the rendered buffer from ffbuf\n");
-        fprintf(stderr,"output: pgm image to file or stdout (-)\n");
+        fprintf(stderr,"output: file or stdout (-)\n");
+        // TODO specify output format pgm/png and 8/16 bit
         exit(1);
     }
     std::string json_input(argv[1]);
@@ -201,6 +225,15 @@ int main(int argc, char **argv)
     {
         if (!write_pgm(std::cout,size_x,size_y,img))
             _err_exit("error: failure writing to stdout\n");
+    }
+    else if (string_ends_with(output_file,".png"))
+    {
+        std::ofstream os(output_file);
+        if (!os.good())
+            _err_exit("error: failure opening output file\n");
+        if (!write_png(os,size_x,size_y,img))
+            _err_exit("error: failure writing to file\n");
+        os.close();
     }
     else
     {

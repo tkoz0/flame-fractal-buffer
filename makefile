@@ -2,7 +2,7 @@ CC=gcc
 CPPC=g++
 IDIR=.
 CFLAGS=-I$(IDIR)
-LIBS=-lm
+LIBS=-lm -lpng
 
 FLAME_HEADERS = flame/renderer.h flame/types.h flame/variations.h
 UTILS_HEADERS = utils/jrand.h utils/json_small.hpp
