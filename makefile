@@ -8,6 +8,9 @@ FLAME_HEADERS = flame/renderer.h flame/types.h flame/variations.h
 UTILS_HEADERS = utils/jrand.h utils/json_small.hpp
 HEADERS = $(FLAME_HEADERS) $(UTILS_HEADERS)
 
+.PHONY: all
+all: ffbuf.out ffgray.out
+
 ffbuf.out: main_buf.o parser.o renderer.o variations.o jrand.o json_small.o
 	$(CPPC) -o ffbuf.out parser.o jrand.o variations.o renderer.o json_small.o main_buf.o $(LIBS)
 
@@ -44,6 +47,5 @@ nlohmann/json.hpp:
 	https://github.com/nlohmann/json/releases/download/v3.11.2/json.hpp
 
 .PHONY: clean
-
 clean:
 	rm jrand.o variations.o renderer.o json_small.o parser.o main_buf.o main_gray.o ffbuf.out ffgray.out
