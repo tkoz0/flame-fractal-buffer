@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <tuple>
 #include <type_traits>
 
 #define likely(x)   __builtin_expect(!!(x),1)
@@ -192,6 +193,7 @@ public:
         return *this;
     }
     // full seed initialization
+    // if specified, seed must point to randsiz words of data
     // force_flag = use zeroes as seed when given nullptr
     Isaac(word_t a0, word_t b0, word_t c0,
         word_t *seed = nullptr, bool force_flag = false)
@@ -203,6 +205,7 @@ public:
         init(seed != nullptr || force_flag, a0, b0, c0);
     }
     // seed with only array (set randa=randb=randc=0)
+    // if specified, seed must point to randsiz words of data
     // force_flag = use zeroes as seed when given nullptr
     Isaac(word_t *seed = nullptr, bool force_flag = false)
     {
@@ -222,15 +225,30 @@ public:
         }
         return randrsl[randcnt];
     }
-    // generate next array of values internally
-    inline void nextValue()
+    // returns number of values left in the current generated values
+    inline word_t count() const
+    {
+        return randcnt;
+    }
+    // generate next array of randsiz values internally
+    inline void generate()
     {
         gen();
         randcnt = randsiz;
     }
-    // returns the values array
-    inline const word_t *values()
+    // returns the values array (length = randsiz)
+    inline const word_t *valuesArray() const
     {
         return randrsl;
+    }
+    // returns the internal state array (length = randsiz)
+    inline const word_t *stateArray() const
+    {
+        return randmem;
+    }
+    // returns the 3 internal state words
+    inline std::tuple<word_t,word_t,word_t> stateWords() const
+    {
+        return std::make_tuple(randa,randb,randc);
     }
 };

@@ -40,7 +40,6 @@ public:
         setSeed((seed_uniquifier *= seed_uniquifier_mult)
             ^ (time(NULL)*multiplier
                 + clock()*((seed_uniquifier_init&(-4L))+1)));
-        has_g = false;
     }
     inline void setSeed(int64_t seed)
     {
