@@ -24,7 +24,7 @@ static int64_t _initial_scramble(int64_t s)
 
 static int64_t _system_time()
 {
-    return time(NULL) + clock() * JRAND_MULTIPLIER;
+    return time(NULL)*JRAND_MULTIPLIER + clock()*(JRAND_SEED_UNIQUIFIER_INIT+1);
 }
 
 static int64_t _SEED_UNIQUIFIER = 8682522807148012L;
@@ -83,7 +83,7 @@ int32_t jrand_next_int_mod(jrand_t *j, int32_t b)
     int32_t r = _jrand_next(j,31);
     int32_t m = b - 1;
     if ((b & m) == 0) // b is a power of 2
-        return (b * r) >> 31;
+        return (b * (int64_t)r) >> 31;
     int32_t u = r;
     r = u % b;
     while (u - r + m < 0)
@@ -125,9 +125,8 @@ double jrand_next_gaussian(jrand_t *j)
 {
     if (j->has_g)
     {
-        double ret = j->next_g;
         j->has_g = false;
-        return ret;
+        return j->next_g;
     }
     else
     {
