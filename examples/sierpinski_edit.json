@@ -1,0 +1,70 @@
+{
+    "name": "sierpinski_edit",
+    "size_x": 512,
+    "size_y": 512,
+    "xmin": -2.0,
+    "xmax": 2.0,
+    "ymin": -2.0,
+    "ymax": 2.0,
+    "xforms": [
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+                //,{"name":"spherical","weight":-0.5}
+                //,{"name":"ex","weight":1.0}
+                ,{"name":"modulus","weight":1.0,"x":0.1,"y":0.1}
+                //,{"name":"fan","weight":1.0}
+                //,{"name":"blob","weight":-1.0,"blob_low":1.0,"blob_high":3.0,"blob_waves":4.0}
+                //,{"name":"pdj","weight":1.0,"pdj_a":1.0,"pdj_b":4.0,"pdj_c":-2.0,"pdj_d":1.0}
+                //,{"name":"popcorn","weight":1.0}
+                //,{"name":"rings2","weight":0.5,"rings2_val":-2.0}
+                //,{"name":"perspective","weight":1.0,"perspective_dist":5.0,"perspective_angle":6.0}
+                //,{"name":"juliascope","weight":1.0,"juliascope_power":-4.0,"juliascope_dist":2.0}
+                //,{"name":"pie","weight":0.25,"slices":3.0,"rotation":0.25,"thickness":0.5}
+                //,{"name":"ngon","weight":1.0,"power":-0.5,"sides":15.0,"corners":0.5,"circle":0.5}
+            ],
+            "pre_affine": [0.5,0.0,-0.0,0.0,0.5,-0.0]
+        },
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+            ],
+            "pre_affine": [0.5,0.0,0.0,0.0,0.5,0.5]
+        },
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+            ],
+            "pre_affine": [0.5,0.0,0.5,0.0,0.5,0.0]
+        }/*,
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+            ],
+            "pre_affine": [-1.0,0.0,0.0,0.0,-1.0,0.0]
+        },
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+            ],
+            "pre_affine": [0.0,-1.0,0.0,1.0,0.0,0.0]
+        },
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+            ],
+            "pre_affine": [1.0,0.0,0.0,-1.0,0.0,0.0]
+        }*/
+    ],
+    "final_xform": {
+       "variations": [
+           {"name":"linear","weight":1.0}
+       ]//,"pre_affine": [0.707107,-0.707107,0.0,0.707107,0.707107,0.0]
+    }
+}

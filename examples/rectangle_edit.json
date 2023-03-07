@@ -1,0 +1,63 @@
+{
+    "name": "rectangle",
+    "size_x": 1280,
+    "size_y": 720,
+    "xmin": -3.0,
+    "xmax": 3.0,
+    "ymin": -1.69,
+    "ymax": 1.69,
+    "xforms": [
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":0.0}
+                ,{"name":"ex","weight":-0.5}
+                ,{"name":"loonie","weight":0.0}
+                ,{"name":"spherical","weight":-1.0}
+            ],
+            "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+            "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+        },
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":1.0}
+                //,{"name":"ngon","weight":0.5,"power":3.0,"sides":6.0,"corners":0.0,"circle":1.0}
+                //,{"name":"curl","weight":0.5,"c1":0.0,"c2":0.5}
+                //,{"name":"rectangles","weight":-0.5,"x":1.5,"y":1.5}
+                //,{"name":"gaussian_blur","weight":0.02}
+                //,{"name":"arch","weight":-0.1}
+                //,{"name":"disc2","weight":3.0,"rotation":1.0,"twist":1.0}
+                //,{"name":"modulus","weight":1.0,"x":1.0,"y":0.01}
+                //,{"name":"bipolar","weight":-1.5,"shift":-1.3}
+                //,{"name":"oscope","weight":1.0,"separation":0.0,"frequency":2.0,"damping":2.0,"amplitude":0.5}
+                //,{"name":"loonie","weight":-1.5}
+                //,{"name":"polar2","weight":-1.0}
+                //,{"name":"stripes","weight":1.0,"space":0.2,"warp":1.0}
+                //,{"name":"wedge","weight":1.0,"swirl":-1.0,"count":5.0,"angle":0.3,"hole":2.0}
+                //,{"name":"flux","weight":1.0,"spread":-1.0}
+                //,{"name":"sinusoidal","weight":0.3}
+            ],
+            "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+            "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+        }/*,
+        {
+            "weight": 1.0,
+            "variations": [
+                {"name":"linear","weight":0.0}
+                ,{"name":"sinusoidal","weight":0.0}
+                ,{"name":"ngon","weight":1.0,"power":2.0,"sides":4.0,"corners":1.0,"circle":1.0}
+            ],
+            "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+            "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+        }*/
+    ]
+    ,"final_xform": {
+        "variations": [
+            {"name":"spherical","weight":0.5},
+            {"name":"elliptic","weight":-1.0}
+        ],
+        "post_affine": [0.0,1.0,0.0,1.0,0.0,0.0]
+    }
+    ,"comment": "https://design.tutsplus.com/articles/fractal-art-an-introduction-to-apophysis--cms-22248"
+}

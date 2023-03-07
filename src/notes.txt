@@ -1,0 +1,12 @@
+
+rename flame-fractal-buffer repo and make a new one with the new code
+
+add precalc flags and precalc vars to new code somehow
+- ACTUALLY DO THIS ON A NEW BRANCH AFTER MAKING THE NEW REPO
+
+TODO weighted transforms to show video of biunit square transforming
+into some transformed biunit square
+
+TODO image correction/filters, maybe just gamma for now, see paper for ideas
+
+for color images, allow xforms with no color (do not change current color)

@@ -1,0 +1,213 @@
+[
+    {
+        "name": "rectangle",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -3.0,
+        "xmax": 3.0,
+        "ymin": -3.0,
+        "ymax": 3.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            }
+        ],
+        "comment": "https://design.tutsplus.com/articles/fractal-art-an-introduction-to-apophysis--cms-22248"
+    },
+    {
+        "name": "rectangle_grid",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -4.0,
+        "xmax": 4.0,
+        "ymin": -4.0,
+        "ymax": 4.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0],
+                "comment": "map onto x axis to form grid pattern"
+            }
+        ]
+    },
+    {
+        "name": "rectangle_maze",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -3.0,
+        "xmax": 3.0,
+        "ymin": -3.0,
+        "ymax": 3.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"sinusoidal","weight":1.0}
+                ],
+                "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            }
+        ]
+    },
+    {
+        "name": "rectangle_swirl",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -3.0,
+        "xmax": 3.0,
+        "ymin": -3.0,
+        "ymax": 3.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"swirl","weight":1.0}
+                ],
+                "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            }
+        ]
+    },
+    {
+        "name": "rectangle_disc",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -3.0,
+        "xmax": 3.0,
+        "ymin": -3.0,
+        "ymax": 3.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"disc","weight":1.0}
+                ],
+                "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            }
+        ]
+    },
+    {
+        "name": "rectangle_ex",
+        "size_x": 800,
+        "size_y": 800,
+        "samples": 10000000,
+        "xmin": -3.0,
+        "xmax": 3.0,
+        "ymin": -3.0,
+        "ymax": 3.0,
+        "xforms": [
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,-0.75,-1.0,0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0}
+                ],
+                "pre_affine": [0.0,0.75,1.0,-0.75,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            },
+            {
+                "weight": 1.0,
+                "variations": [
+                    {"name":"linear","weight":1.0},
+                    {"name":"ex","weight":1.0}
+                ],
+                "pre_affine": [1.0,-1.0,0.0,0.0,0.0,0.0],
+                "post_affine": [1.0,0.0,0.0,0.0,1.0,0.0]
+            }
+        ]
+    }
+]
